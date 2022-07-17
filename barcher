@@ -1,0 +1,19 @@
+#!/bin/sh
+
+#for PID in $(pgrep polybar)
+#do
+#    kill -9 $PID
+#done
+pgrep polybar | xargs /bin/kill -9
+cd $XDG_CONFIG_HOME/polybar
+./hack/launch.sh
+IS_HDMI=0
+for MONITOR in $(xrandr | grep -w connected | cut -d' ' -f1 | cut -d'-' -f1)
+do
+    if [ "$MONITOR" = HDMI ]; then
+       IS_HDMI=1
+    fi
+done
+if [ $IS_HDMI = 1 ]; then
+    ./forest/launch.sh
+fi

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+dunstctl close-all
+pamixer --allow-boost -i 5
+notify-send -c sound -t 1500 "Volume increased" "Current volume $(pamixer --get-volume)"

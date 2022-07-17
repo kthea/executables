@@ -1,0 +1,14 @@
+#!/bin/sh
+
+for response in "$@";
+do
+	find $HOME/Documents -name "$response".mp3 | xargs /usr/bin/mpv --really-quiet
+done
+# find ~/Documents/videos -type f -exec grep -Iq . {} \; -print | xargs basename -a
+# list all the files that can be played
+# source https://stackoverflow.com/questions/4767396/linux-command-how-to-find-only-text-files
+
+# later edit
+# find ~/Documents/videos -type f -exec grep -Iq . {} \; -print | xargs -I '{}' bash -c 'play $(basename -a {}) '
+# way to instantly play all available in the order they are found
+# https://stackoverflow.com/questions/29278466/can-xargs-execute-a-subshell-command-for-each-argument

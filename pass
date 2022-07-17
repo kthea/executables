@@ -1,0 +1,3 @@
+#!/bin/sh
+
+keepassxc || alacritty -e keepassxc-cli open ~/Documents/pass/Passwords.kdbx || xterm -e keepassxc-cli open ~/Documents/pass/Passwords.kdbx 

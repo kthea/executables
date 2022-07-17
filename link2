@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# "posix" version of getting last arguments
+for last in "$@"; do :; done
+# TODO: make order not matter
+
+url=$(curl -s "$last" | grep -Eo 'channel_id=.{24}' | head -n1)
+
+while getopts ":t:a:" option; do
+	case "$option" in
+		t)
+			# the "t" option has to be used before "a" atm
+			tags=$(echo "$OPTARG" | tr , ' ')
+			;;
+		a) 
+			# beware of extra whitespace after \
+			# it brakes the split, newline has to be
+			# directly after \
+			# so that is why vim was highligthing \ in red
+			# now I know
+			echo "https://www.youtube.com/feeds/videos.xml?""$url" \
+				"$tags" >> "$XDG_CONFIG_HOME"/newsboat/urls
+			exit
+			;;
+		?)
+			echo "invalid option"
+			exit
+			;;
+	esac
+done

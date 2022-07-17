@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+#ls "$HOME"/Documents/pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete" | xargs -I {} feh --bg-fill --no-fehbg "{}"
+#sel=$(find "$HOME"/Documents/pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete")
+WALL_DIR="$HOME"/Documents/pictures/wallpapers
+sel=$WALL_DIR/$(ls "$WALL_DIR" | dmenu -i -l 10 -fn  "Hack Regular Nerd Font Complete")
+# otherwise sel is set to first item and it is ugly
+# and I need to add this dreary / at the end because otherwise it
+# does not match
+# TODO: make trailing slash independent
+if [ "$sel" = "$WALL_DIR"/ ];
+then
+	exit 1
+fi
+feh --bg-fill --no-fehbg "$sel"
+prev=$(grep "WALLPAPER" "$XDG_CONFIG_HOME"/shell/variables | cut -d= -f2)
+sed -i "s,$prev,$sel,g" "$XDG_CONFIG_HOME"/shell/variables 

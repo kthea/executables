@@ -1,0 +1,1 @@
+/usr/bin/git --git-dir=$HOME/Documents/executables --work-tree=$HOME/.local/bin "$@"

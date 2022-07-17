@@ -1,0 +1,15 @@
+#!/bin/sh
+
+hour=$(date +'%H') 
+redshift -x > /dev/null 2>&1
+
+if [ "$hour" -gt 15 ] || [ "$hour" -le 8 ]; then
+	xbacklight -set 50
+	xrandr --output HDMI-0 --brightness 0.6 > /dev/null 2>&1
+	redshift -O 4500k > /dev/null 2>&1
+	redshift -O 4500k > /dev/null 2>&1
+else
+	xbacklight -set 90
+	xrandr --output HDMI-0 --brightness 1 > /dev/null 2>&1
+	redshift -x > /dev/null 2>&1
+fi

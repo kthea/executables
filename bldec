@@ -1,0 +1,8 @@
+#!/bin/sh
+
+dunstctl close-all
+xbacklight -dec 10
+notify-send -c brightness -t 1500 "Brightness decreased"\
+ "Current brightness $(xbacklight -get | cut -d'.' -f1)"
+# I have to leave whitespace in the beginning or else the
+# formatting is not correct

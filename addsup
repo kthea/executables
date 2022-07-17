@@ -1,0 +1,6 @@
+#!/bin/bash
+
+setxkbmap pl -option caps:swapescape
+xmodmap -e "keysym Menu = Super_R" 
+# TODO: add check if keyboard has menu key
+# TODO 2: is it necessary though

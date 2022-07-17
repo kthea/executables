@@ -1,0 +1,31 @@
+#!/bin/sh
+miphone_addr="192.168.1.8"
+mipad_addr="192.168.1.12"
+miphone_dir="$HOME/Documents/backup/miphone"
+mipad_dir="$HOME/Documents/backup/mipad"
+# trailing slash - do not create dir
+# in this case I want it to create dir if
+# not present already
+
+# assume that simple sshd in running on android device
+# TODO: add error message when connection fails
+# rsync -rtvzP root@192.168.1.8:/sdcard/DCIM/Camera .
+
+# this ping actually does not do what I wanted it to do
+ping -W 0.5 -c1 "$miphone_addr" 2>&1 > /dev/null
+
+if [ $? = 0 ];
+then
+# maybe make this into a function
+	rsync -rtvzP root@"${miphone_addr}":/sdcard/DCIM/Camera "$miphone_dir"
+	rsync -rtvzP root@"${miphone_addr}":/sdcard/Pictures "$miphone_dir"
+	rsync -rtvzP root@"${miphone_addr}":/sdcard/DCIM/Screenshots "$miphone_dir"
+fi
+
+ping -W 0.5 -c1 "$mipad_addr" 2>&1 > /dev/null
+if [ $? = 0 ];
+then
+	rsync -rtvzP root@"${mipad_addr}":/sdcard/DCIM/Camera "$mipad_dir"
+	rsync -rtvzP root@"${mipad_addr}":/sdcard/Pictures "$mipad_dir"
+	rsync -rtvzP root@"${mipad_addr}":/sdcard/DCIM/Screenshots "$mipad_dir"
+fi

@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# the file only has to lines of importance
+# the first and second one
+# anything after is treated as comment to
+# the user
+# program assumes that and will not abort
+# on error
+
+start=$(sed '1q;d' $1)
+end=$(sed '2q;d' $1)
+
+# first field represent hour
+# then there are minutes seperated by :
+# then second seperated by :
+# lastly miliseconds seperated .
+
+start_h="$(echo $start | cut -d: -f1)"
+end_h="$(echo $end | cut -d: -f1)"
+
+hs_to_sec="$(( ($end_h - $start_h) * 3600))"
+
+start_m="$(echo $start | cut -d: -f2)"
+end_m="$(echo $end | cut -d: -f2)"
+
+if [ $end_m -lt $start_m ]; then
+	# I think it is correct
+	hs_to_sec="$((hs_to_sec - start_m + end_m))"
+else
+	ms_to_sec="$(( ($end_m - $start_m) * 60))"
+fi
+
+start_s="$(echo $start | cut -d: -f3 | cut -d. -f1)"
+end_s="$(echo $end | cut -d: -f3 | cut -d. -f1)"
+
+if [ $end_s -lt $start_s ]; then
+	ms_to_sec="$((ms_to_sec - start_s + end_s))"
+	sec=0
+else
+	sec="$(( 10#$end_s - 10#$start_s ))"
+fi
+
+start_mili="$(echo $start | cut -d. -f2)"
+end_mili="$(echo $end | cut -d. -f2)"
+
+if [ $end_mili -lt $start_mili ]; then
+	sec="$(( sec - 1))"
+	mili="$(( 1000 - $start_mili + $end_mili ))"
+else
+	mili="$(( $end_mili - $start_mili ))"
+fi
+
+sec="$((hs_to_sec + ms_to_sec + sec))"
+echo ${sec}.${mili}
