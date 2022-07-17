@@ -30,7 +30,13 @@ make_copy() {
 # trailing slash because variable does not have it
 # exclude dreary emacs nonsense
     bnf ls-files > /tmp/file_list
-    rsync -rtvzP --files-from=/tmp/file_list "$HOME"/.local/bin/ "$mount_point"/bin_bak --delete --delete-excluded
+    rsync -rtvzP --include-from=/tmp/file_list --exclude="*" "$HOME"/.local/bin/\
+    "$mount_point"/bin_bak --delete-excluded
+#https://stackoverflow.com/questions/1813907/rsync-delete-files-from-list-dest-does-not-delete-unwanted-files
+# as per above I could use include-from to remove files that are no longer in source because --files-from
+# did not delete anything even when --delete was used so I guess --include-from and --exclude AFTER is
+# the way to go. Exclude has to be after include otherwise everything will be ignored.
+
 # I do not know it if there is a way that could avoid creating the file
 # but examples I reviewed also used it so I do not care as it will be
 # deleted after reboot anyway
