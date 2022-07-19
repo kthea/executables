@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# the file only has to lines of importance
-# the first and second one
+# the file only has 3 lines of importance
+# first one has the start of sequence
+# second one is the end, third is the name
+# of the source file containing the sequence
 # anything after is treated as comment to
 # the user
 # program assumes that and will not abort
@@ -9,6 +11,7 @@
 
 start=$(sed '1q;d' $1)
 end=$(sed '2q;d' $1)
+file_name=$(sed '3q;d' $1)
 
 # first field represent hour
 # then there are minutes seperated by :
@@ -51,4 +54,10 @@ else
 fi
 
 sec="$((hs_to_sec + ms_to_sec + sec))"
-echo ${sec}.${mili}
+duration=${sec}.${mili}
+echo $duration
+
+# first argument is the is the name of description file
+# and resulting .mp{3,4}
+ffmpeg -y -ss $(head -n1 $1) -i $file_name -t $duration $1.mp4
+ffmpeg -y -i $1.mp4 $1.mp3
