@@ -30,14 +30,18 @@ if [ $end_m -lt $start_m ]; then
 	# I think it is correct
 	hs_to_sec="$((hs_to_sec - start_m + end_m))"
 else
-	ms_to_sec="$(( ($end_m - $start_m) * 60))"
+	ms_to_sec="$(( (10#$end_m - 10#$start_m) * 60))"
 fi
 
 start_s="$(echo $start | cut -d: -f3 | cut -d. -f1)"
 end_s="$(echo $end | cut -d: -f3 | cut -d. -f1)"
 
 if [ $end_s -lt $start_s ]; then
-	ms_to_sec="$((ms_to_sec - start_s + end_s))"
+	# can I omit $ sign here
+	# why did I not put it here but in some places
+	# it is present
+	#TODO: test this
+	ms_to_sec="$(( ms_to_sec - start_s + end_s))"
 	sec=0
 else
 	sec="$(( 10#$end_s - 10#$start_s ))"
@@ -48,16 +52,21 @@ end_mili="$(echo $end | cut -d. -f2)"
 
 if [ $end_mili -lt $start_mili ]; then
 	sec="$(( sec - 1))"
-	mili="$(( 1000 - $start_mili + $end_mili ))"
+	mili="$(( 1000 - 10#$start_mili + 10#$end_mili ))"
 else
-	mili="$(( $end_mili - $start_mili ))"
+	mili="$(( 10#$end_mili - 10#$start_mili ))"
 fi
 
 sec="$((hs_to_sec + ms_to_sec + sec))"
 duration=${sec}.${mili}
+# for debugging purpose only
 echo $duration
+# will by default by quiet later
 
 # first argument is the is the name of description file
 # and resulting .mp{3,4}
-ffmpeg -y -ss $(head -n1 $1) -i $file_name -t $duration $1.mp4
-ffmpeg -y -i $1.mp4 $1.mp3
+ffmpeg -hide_banner -loglevel error -y -ss $(head -n1 $1) -i $file_name -t $duration $1.mp4
+ffmpeg -hide_banner -loglevel error -y -i $1.mp4 $1.mp3
+# I do not want to see the garbage ffmpeg prints
+# certainly not all of it
+# might fine tune it later
