@@ -6,7 +6,8 @@ device_label="Samsung240GB0921"
 device_name="samsung_usb"
 # no trailing slash here, might change later
 mount_point=/media/"$USER"/usb_drive1
-
+# might
+key_location="$HOME"/Documents/pass/key_file_luks_usb
 # first argument is label and second is the name
 # for cryptsetup and the last one is mount point
 open_device() {
@@ -16,10 +17,14 @@ open_device() {
 # encrypted partition this only works for luks2 headers
 # but I do not care as of now
 # sudo cryptsetup config /dev/sda1 --label Samsung240GB0921
+# alternative way without typing this dreary passphrase
+# sudo cryptsetup open --key-file ~/Documents/pass/key_file_luks_usb /dev/disk/by-label/Samsung240GB0921 samsung_usb
+#TODO adjust this function to use it
     test -b /dev/disk/by-label/"$1" || exit 1
-    test -b /dev/mapper/"$2" || (sudo cryptsetup\
-	open /dev/disk/by-label/"$1" "$2" && sudo fsck /dev/mapper/"$2" &&\
-	sudo mount -t ext4 /dev/mapper/"$2" "$3")
+    test -b /dev/mapper/"$2" || sudo cryptsetup open --key-file ~/Documents/pass/key_file_luks_usb\
+	/dev/disk/by-label/"$1" "$2"
+    test -b /dev/mapper/"$2" || sudo cryptsetup open /dev/disk/by-label/"$1" "$2" 
+    sudo fsck /dev/mapper/"$2" && sudo mount -t ext4 /dev/mapper/"$2" "$3"
 }
 
 make_copy() {
