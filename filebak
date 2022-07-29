@@ -19,12 +19,18 @@ open_device() {
 # sudo cryptsetup config /dev/sda1 --label Samsung240GB0921
 # alternative way without typing this dreary passphrase
 # sudo cryptsetup open --key-file ~/Documents/pass/key_file_luks_usb /dev/disk/by-label/Samsung240GB0921 samsung_usb
-#TODO adjust this function to use it
-    test -b /dev/disk/by-label/"$1" || exit 1
-    test -b /dev/mapper/"$2" || sudo cryptsetup open --key-file ~/Documents/pass/key_file_luks_usb\
+    test -b /dev/disk/by-label/"$1" || { echo "Device $1 does not exist"; exit 1; }
+    test -b /dev/mapper/"$2" || sudo cryptsetup open --key-file "$HOME"/Documents/pass/key_file_luks_usb\
 	/dev/disk/by-label/"$1" "$2"
     test -b /dev/mapper/"$2" || sudo cryptsetup open /dev/disk/by-label/"$1" "$2" 
-    sudo fsck /dev/mapper/"$2" && sudo mount -t ext4 /dev/mapper/"$2" "$3"
+    mount | grep "$2" || { sudo fsck /dev/mapper/"$2" ||\
+	{ echo "fsck failed!"; exit 1; }; sudo mount -t ext4 /dev/mapper/"$2" "$3"; }
+}
+
+close_device() {
+    #sudo umount "$1" && sudo cryptsetup close "$2"
+    sudo umount "$1" || echo "$1 not mounted" 
+    sudo cryptsetup close "$2" || { echo "$2 is already closed"; exit 1; }
 }
 
 make_copy() {
@@ -34,9 +40,12 @@ make_copy() {
 # duplicates if the files were moved/renamed whatever
 # trailing slash because variable does not have it
 # exclude dreary emacs nonsense
-    bnf ls-files > /tmp/file_list
-    rsync -rtvzP --include-from=/tmp/file_list --exclude="*" "$HOME"/.local/bin/\
-    "$mount_point"/bin_bak --delete-excluded
+# I dedided to split file list into two files because of the
+# problems with parallel read I know I could use wait but
+# the files will be deleted on reboot any way so I do not care
+    bnf ls-files > /tmp/file_list_bin
+    rsync -rtvzP --include-from=/tmp/file_list_bin --exclude="*" "$HOME"/.local/bin/\
+    "$mount_point"/bin_bak --delete-excluded &
 #https://stackoverflow.com/questions/1813907/rsync-delete-files-from-list-dest-does-not-delete-unwanted-files
 # as per above I could use include-from to remove files that are no longer in source because --files-from
 # did not delete anything even when --delete was used so I guess --include-from and --exclude AFTER is
@@ -45,9 +54,9 @@ make_copy() {
 # I do not know it if there is a way that could avoid creating the file
 # but examples I reviewed also used it so I do not care as it will be
 # deleted after reboot anyway
-    cnf ls-files > /tmp/file_list
-    rsync -rtvzP --files-from=/tmp/file_list "$XDG_CONFIG_HOME"/\
-	/media/thea/usb_drive1/conf_bak --delete
+    cnf ls-files > /tmp/file_list_config
+    rsync -rtvzP --files-from=/tmp/file_list_config "$XDG_CONFIG_HOME"/\
+	/media/thea/usb_drive1/conf_bak --delete &
 # it seems that delete doe snot work with files-from
 # I will need to debug this later because the unwanted files
 # remained so I clearly made a mistake
@@ -59,17 +68,19 @@ make_copy() {
     rsync -rtvzP --exclude vms --exclude backup --exclude configuration\
 	--exclude executables\
 	"$HOME"/Documents/ /media/thea/usb_drive1/doc_bak\
-	--delete --delete-excluded
+	--delete --delete-excluded &
 
     rsync -rtvzP --exclude="*~" "$HOME"/Journals/ "$mount_point"/jour_bak\
-	--delete --delete-excluded
+	--delete --delete-excluded &
 }
-
 
 open_device "$device_label" "$device_name" "$mount_point"
 
 make_copy
-
+wait
+# TODO: use argument to determine if close or not but
+# still make close default
+close_device "$mount_point" "$device_name"
 # the last thing to consider would be phone/tablet backups
 # as they mostly consist of photos and music which should be
 # moved to their respective folders on my system not sit
