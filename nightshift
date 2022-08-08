@@ -3,6 +3,22 @@
 hour=$(date +'%H') 
 redshift -x > /dev/null 2>&1
 
+if [ "$(date +%B)" = August ]; then
+    if [ "$hour" -gt 19 ] || [ "$hour" -le 7 ]; then
+	xbacklight -set 50
+	xrandr --output HDMI-0 --brightness 0.6 > /dev/null 2>&1
+	redshift -O 4500k > /dev/null 2>&1
+	redshift -O 4500k > /dev/null 2>&1
+	exit 0
+    else
+	echo "Too early to set night mode. Setting default values for the day"
+	xbacklight -set 90
+	xrandr --output HDMI-0 --brightness 1 > /dev/null 2>&1
+	redshift -x > /dev/null 2>&1
+	exit 0
+    fi
+fi
+
 if [ "$hour" -gt 15 ] || [ "$hour" -le 8 ]; then
 	xbacklight -set 50
 	xrandr --output HDMI-0 --brightness 0.6 > /dev/null 2>&1
