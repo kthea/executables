@@ -2,7 +2,7 @@
 
 for response in "$@";
 do
-	find $HOME/Documents -name "$response".mp3 | xargs /usr/bin/mpv --really-quiet
+	find $HOME/Videos -name "$response".mp3 | xargs /usr/bin/mpv --really-quiet
 done
 # find ~/Documents/videos -type f -exec grep -Iq . {} \; -print | xargs basename -a
 # list all the files that can be played

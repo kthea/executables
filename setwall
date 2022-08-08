@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-#ls "$HOME"/Documents/pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete" | xargs -I {} feh --bg-fill --no-fehbg "{}"
-#sel=$(find "$HOME"/Documents/pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete")
-WALL_DIR="$HOME"/Documents/pictures/wallpapers
+#ls "$HOME"/Pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete" | xargs -I {} feh --bg-fill --no-fehbg "{}"
+#sel=$(find "$HOME"/Pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete")
+WALL_DIR="$HOME"/Pictures/wallpapers
 sel=$WALL_DIR/$(ls "$WALL_DIR" | dmenu -i -l 10 -fn  "Hack Regular Nerd Font Complete")
 # otherwise sel is set to first item and it is ugly
 # and I need to add this dreary / at the end because otherwise it
