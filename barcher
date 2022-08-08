@@ -5,8 +5,10 @@
 #    kill -9 $PID
 #done
 pgrep polybar | xargs /bin/kill -9
-cd $XDG_CONFIG_HOME/polybar
-./hack/launch.sh
+cd $XDG_CONFIG_HOME/polybar || { echo "Configuration file does not exist" ; exit 1; }
+# I got bored with hack, trying something new.
+#./hack/launch.sh
+polybar -c $XDG_CONFIG_HOME/polybar/main/config.ini laptop &
 IS_HDMI=0
 for MONITOR in $(xrandr | grep -w connected | cut -d' ' -f1 | cut -d'-' -f1)
 do
@@ -15,5 +17,6 @@ do
     fi
 done
 if [ $IS_HDMI = 1 ]; then
-    ./forest/launch.sh
+    polybar -c $XDG_CONFIG_HOME/polybar/main/config.ini monitor &
+    #./forest/launch.sh
 fi
