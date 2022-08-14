@@ -70,7 +70,19 @@ make_copy() {
 	"$HOME"/Documents/ /media/thea/usb_drive1/doc_bak\
 	--delete --delete-excluded &
 
+    rsync -rtvzP "$HOME"/Videos /media/thea/usb_drive1/\
+	--delete --delete-excluded &
+
+    rsync -rtvzP "$HOME"/Notes /media/thea/usb_drive1/\
+	--delete --delete-excluded &
+
+    rsync -rtvzP "$HOME"/Pictures /media/thea/usb_drive1/\
+	--delete --delete-excluded &
+
     rsync -rtvzP --exclude="*~" "$HOME"/Journals/ "$mount_point"/jour_bak\
+	--delete --delete-excluded &
+
+    rsync -rtvzP --exclude="*~" "$HOME"/University/ "$mount_point"/uni_bak\
 	--delete --delete-excluded &
 }
 
