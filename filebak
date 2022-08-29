@@ -5,7 +5,7 @@ device_label="Samsung240GB0921"
 
 device_name="samsung_usb"
 # no trailing slash here, might change later
-mount_point=/media/"$USER"/usb_drive1
+mount_point=/media/"$USER"/samsung240gb
 # might
 key_location="$HOME"/Documents/pass/key_file_luks_usb
 # first argument is label and second is the name
@@ -24,12 +24,12 @@ open_device() {
 	/dev/disk/by-label/"$1" "$2"
     test -b /dev/mapper/"$2" || sudo cryptsetup open /dev/disk/by-label/"$1" "$2" 
     mount | grep "$2" || { sudo fsck /dev/mapper/"$2" ||\
-	{ echo "fsck failed!"; exit 1; }; sudo mount -t ext4 /dev/mapper/"$2" "$3"; }
+	{ echo "fsck failed!"; exit 1; }; mount /dev/disk/by-label/"$1"; }
 }
 
 close_device() {
     #sudo umount "$1" && sudo cryptsetup close "$2"
-    sudo umount "$1" || echo "$1 not mounted" 
+    umount "$1" || echo "$1 not mounted" 
     sudo cryptsetup close "$2" || { echo "$2 is already closed"; exit 1; }
 }
 
@@ -56,7 +56,7 @@ make_copy() {
 # deleted after reboot anyway
     cnf ls-files > /tmp/file_list_config
     rsync -rtvzP --files-from=/tmp/file_list_config "$XDG_CONFIG_HOME"/\
-	/media/thea/usb_drive1/conf_bak --delete &
+	$mount_point/conf_bak --delete &
 # it seems that delete doe snot work with files-from
 # I will need to debug this later because the unwanted files
 # remained so I clearly made a mistake
@@ -67,16 +67,16 @@ make_copy() {
 # as they can also be in the dl/software/images folder
     rsync -rtvzP --exclude vms --exclude backup --exclude configuration\
 	--exclude executables\
-	"$HOME"/Documents/ /media/thea/usb_drive1/doc_bak\
+	"$HOME"/Documents/ $mount_point/doc_bak\
 	--delete --delete-excluded &
 
-    rsync -rtvzP "$HOME"/Videos /media/thea/usb_drive1/\
+    rsync -rtvzP "$HOME"/Videos $mount_point/\
 	--delete --delete-excluded &
 
-    rsync -rtvzP "$HOME"/Notes /media/thea/usb_drive1/\
+    rsync -rtvzP "$HOME"/Notes $mount_point/\
 	--delete --delete-excluded &
 
-    rsync -rtvzP "$HOME"/Pictures /media/thea/usb_drive1/\
+    rsync -rtvzP "$HOME"/Pictures $mount_point/\
 	--delete --delete-excluded &
 
     rsync -rtvzP --exclude="*~" "$HOME"/Journals/ "$mount_point"/jour_bak\
