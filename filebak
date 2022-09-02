@@ -66,7 +66,7 @@ make_copy() {
 # maybe here also include iso but I am not so sure
 # as they can also be in the dl/software/images folder
     rsync -rtvzP --exclude vms --exclude backup --exclude configuration\
-	--exclude executables\
+	--exclude executables --exclude "dl/software/images"\
 	"$HOME"/Documents/ $mount_point/doc_bak\
 	--delete --delete-excluded &
 
@@ -82,8 +82,8 @@ make_copy() {
     rsync -rtvzP --exclude="*~" "$HOME"/Journals/ "$mount_point"/jour_bak\
 	--delete --delete-excluded &
 
-    rsync -rtvzP --exclude="*~" "$HOME"/University/ "$mount_point"/uni_bak\
-	--delete --delete-excluded &
+    rsync -rtvzP --exclude="**/.git*" --exclude="*~" "$HOME"/University/\
+	"$mount_point"/uni_bak --delete --delete-excluded &
 }
 
 open_device "$device_label" "$device_name" "$mount_point"
