@@ -1,13 +1,23 @@
 #!/bin/sh
 
 # or something similar
-device_label="Samsung240GB0921"
+device_label="${1:-Samsung240GB0921}"
+echo $device_label
 
-device_name="samsung_usb"
+device_name="${2:-samsung240gb}"
 # no trailing slash here, might change later
-mount_point=/media/"$USER"/samsung240gb
-# might
-key_location="$HOME"/Documents/pass/key_file_luks_usb
+echo $device_name
+# prefix has to be without trailing slash
+backup_prefix="/media/$USER"
+# find the number of field that contains the folder of mountpoint
+prefix_length="$(echo $backup_prefix | grep -o / | wc -l)"
+backup_destination="$backup_prefix/${3:-$device_name}"
+# not implemented yet but gives the foundation to use
+# mount point with different name then encrypted container
+mount_name=$(echo $backup_destination | cut -d/ -f $(($len + 2)))
+echo $backup_destination
+key_location="$HOME"/Documents/pass/"${4:-key_file_luks_usb}"
+echo $key_location
 # first argument is label and second is the name
 # for cryptsetup and the last one is mount point
 open_device() {
@@ -20,16 +30,22 @@ open_device() {
 # alternative way without typing this dreary passphrase
 # sudo cryptsetup open --key-file ~/Documents/pass/key_file_luks_usb /dev/disk/by-label/Samsung240GB0921 samsung_usb
     test -b /dev/disk/by-label/"$1" || { echo "Device $1 does not exist"; exit 1; }
-    test -b /dev/mapper/"$2" || sudo cryptsetup open --key-file "$HOME"/Documents/pass/key_file_luks_usb\
+    test -b /dev/mapper/"$2" || sudo cryptsetup open --key-file "$key_location"\
 	/dev/disk/by-label/"$1" "$2"
-    test -b /dev/mapper/"$2" || sudo cryptsetup open /dev/disk/by-label/"$1" "$2" 
+    test -b /dev/mapper/"$2" || sudo cryptsetup open /dev/disk/by-label/"$1" "$2"
     mount | grep "$2" || { sudo fsck /dev/mapper/"$2" ||\
 	{ echo "fsck failed!"; exit 1; }; mount /dev/disk/by-label/"$1"; }
 }
 
 close_device() {
     #sudo umount "$1" && sudo cryptsetup close "$2"
-    umount "$1" || echo "$1 not mounted" 
+    # I add user to fstab so I do not have to use sudo
+    # because I changed mountpoint to backup_destination
+    # now I just put it here but I guess I have to make
+    # into variable again
+    # TODO differentiate mountpoint and destination as they
+    # are not the same any more
+    umount "$backup_prefix/$device_name" || echo "$1 not mounted" 
     sudo cryptsetup close "$2" || { echo "$2 is already closed"; exit 1; }
 }
 
@@ -45,7 +61,7 @@ make_copy() {
 # the files will be deleted on reboot any way so I do not care
     bnf ls-files > /tmp/file_list_bin
     rsync -rtvzP --include-from=/tmp/file_list_bin --exclude="*" "$HOME"/.local/bin/\
-    "$mount_point"/bin_bak --delete-excluded &
+    "$backup_destination"/bin_bak --delete-excluded &
 #https://stackoverflow.com/questions/1813907/rsync-delete-files-from-list-dest-does-not-delete-unwanted-files
 # as per above I could use include-from to remove files that are no longer in source because --files-from
 # did not delete anything even when --delete was used so I guess --include-from and --exclude AFTER is
@@ -56,7 +72,7 @@ make_copy() {
 # deleted after reboot anyway
     cnf ls-files > /tmp/file_list_config
     rsync -rtvzP --files-from=/tmp/file_list_config "$XDG_CONFIG_HOME"/\
-	$mount_point/conf_bak --delete &
+	$backup_destination/conf_bak --delete &
 # it seems that delete doe snot work with files-from
 # I will need to debug this later because the unwanted files
 # remained so I clearly made a mistake
@@ -67,32 +83,32 @@ make_copy() {
 # as they can also be in the dl/software/images folder
     rsync -rtvzP --exclude vms --exclude backup --exclude configuration\
 	--exclude executables --exclude "dl/software/images"\
-	"$HOME"/Documents/ $mount_point/doc_bak\
+	"$HOME"/Documents/ $backup_destination/doc_bak\
 	--delete --delete-excluded &
 
-    rsync -rtvzP "$HOME"/Videos $mount_point/\
+    rsync -rtvzP "$HOME"/Videos $backup_destination/\
 	--delete --delete-excluded &
 
-    rsync -rtvzP "$HOME"/Notes $mount_point/\
+    rsync -rtvzP "$HOME"/Notes $backup_destination/\
 	--delete --delete-excluded &
 
-    rsync -rtvzP "$HOME"/Pictures $mount_point/\
+    rsync -rtvzP "$HOME"/Pictures $backup_destination/\
 	--delete --delete-excluded &
 
-    rsync -rtvzP --exclude="*~" "$HOME"/Journals/ "$mount_point"/jour_bak\
+    rsync -rtvzP --exclude="*~" "$HOME"/Journals/ "$backup_destination"/jour_bak\
 	--delete --delete-excluded &
 
     rsync -rtvzP --exclude="**/.git*" --exclude="*~" "$HOME"/University/\
-	"$mount_point"/uni_bak --delete --delete-excluded &
+	"$backup_destination"/uni_bak --delete --delete-excluded &
 }
 
-open_device "$device_label" "$device_name" "$mount_point"
+open_device "$device_label" "$device_name" "$backup_destination"
 
 make_copy
 wait
 # TODO: use argument to determine if close or not but
 # still make close default
-close_device "$mount_point" "$device_name"
+close_device "$backup_destination" "$device_name"
 # the last thing to consider would be phone/tablet backups
 # as they mostly consist of photos and music which should be
 # moved to their respective folders on my system not sit
