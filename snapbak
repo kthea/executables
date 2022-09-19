@@ -1,0 +1,34 @@
+#!/bin/sh
+
+backup_prefix=/media/$USER
+device_name=${1:-wd_black}
+backup_destination=$backup_prefix/$device_name/snapshots/$(date -I)
+mkdir -p $backup_prefix/$device_name/snapshots/$(date -I)
+
+cnf ls-files > /tmp/file_list_config
+rsync -rtvzP --files-from=/tmp/file_list_config\
+    "$XDG_CONFIG_HOME"/$backup_destination/conf_bak\
+    --delete
+
+bnf ls-files > /tmp/file_list_bin
+rsync -rtvzP --include-from=/tmp/file_list_bin --exclude="*"\
+    "$HOME"/.local/bin/ "$backup_destination"/bin_bak\
+    --delete-excluded
+
+mnf ls-files > /tmp/file_list_man
+rsync -rtvzP --files-from=/tmp/file_list_man\
+    "$HOME"/.local/share/man/\
+    "$backup_destination"/man_bak --delete-excluded
+
+rsync -rtvzP --exclude vms --exclude backup --exclude\
+    configuration\ --exclude executables --exclude\
+    "dl/software/images"\ "$HOME"/Documents $backup_destination/\
+    --delete --delete-excluded
+rsync -rtvzP "$HOME"/Notes $backup_destination/\
+    --delete --delete-excluded
+rsync -rtvzP "$HOME"/Pictures $backup_destination/\
+    --delete --delete-excluded
+rsync -rtvzP --exclude="*~" "$HOME"/Journals\
+    "$backup_destination"/ --delete --delete-excluded
+rsync -rtvzP --exclude="**/.git" "$HOME"/Projects\
+    $backup_destination/ --delete --delete-excluded
