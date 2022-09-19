@@ -1,5 +1,6 @@
 #!/bin/sh
-miphone_addr="192.168.1.8"
+#miphone_addr="192.168.1.8"
+miphone_addr="192.168.1.25"
 mipad_addr="192.168.1.12"
 miphone_dir="$HOME/Documents/backup/miphone"
 mipad_dir="$HOME/Documents/backup/mipad"
