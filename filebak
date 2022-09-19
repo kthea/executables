@@ -78,6 +78,10 @@ make_copy() {
 # remained so I clearly made a mistake
 # only get the useful files that are in the repo, cnf is my local command as per
 # https://news.ycombinator.com/item?id=11071754
+    
+    mnf ls-files > /tmp/file_list_man
+    rsync -rtvzP --files-from=/tmp/file_list_man "$HOME"/.local/share/man/\
+	"$backup_destination"/man_bak --delete-excluded &
 
 # maybe here also include iso but I am not so sure
 # as they can also be in the dl/software/images folder
