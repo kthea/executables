@@ -7,7 +7,7 @@ mkdir -p $backup_prefix/$device_name/snapshots/$(date -I)
 
 cnf ls-files > /tmp/file_list_config
 rsync -rtvzP --files-from=/tmp/file_list_config\
-    "$XDG_CONFIG_HOME"/$backup_destination/conf_bak\
+    "$XDG_CONFIG_HOME"/ $backup_destination/conf_bak\
     --delete
 
 bnf ls-files > /tmp/file_list_bin
@@ -22,7 +22,7 @@ rsync -rtvzP --files-from=/tmp/file_list_man\
 
 rsync -rtvzP --exclude vms --exclude backup --exclude\
     configuration\ --exclude executables --exclude\
-    "dl/software/images"\ "$HOME"/Documents $backup_destination/\
+    "dl/software/images" "$HOME"/Documents $backup_destination/\
     --delete --delete-excluded
 rsync -rtvzP "$HOME"/Notes $backup_destination/\
     --delete --delete-excluded
