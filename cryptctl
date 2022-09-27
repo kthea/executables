@@ -1,0 +1,91 @@
+#!/bin/bash
+
+scr() {
+    # just for less typing
+    sudo cryptsetup "$@"
+}
+
+open_device() {
+    # check if device is even detected by the system
+    test -b /dev/disk/by-label/"$1" || { echo "Device $1 does not exist"; exit 1; }
+    # check if it is already opened, it is easier to check /dev/mapper
+    # than using cryptsetup status
+    test -b /dev/mapper/"$1" || scr open --key-file "$2" /dev/disk/by-label/"$1" "$1"
+    test -b /dev/mapper/"$1" || scr open /dev/disk/by-label/"$1" "$1"
+    # the preferred method of opening is with keyfile otherwise just standard command
+    # mount | grep "$2" || { sudo fsck /dev/mapper/"$2" ||\
+    # 	{ echo "fsck failed!"; exit 1; }; mount /dev/disk/by-label/"$1"; }
+    # the old method of mounting, for now I will just rely on fstab
+    if [ $? -ne 0 ];
+	then
+	echo "Failed to open device $1"
+	exit 1
+    fi
+    mount | grep "$1" || { mount /dev/mapper/"$1"; }
+}
+
+close_device() {
+    umount /dev/mapper/"$1" || echo "$1 not mounted" 
+    scr close "$1" || { echo "$1 is already closed"; exit 1; }
+}
+
+display_help() {
+    cat <<EOF
+Simple script to open/close, mount/unmount encrypted drives
+Usage:
+-o: open the LUKS container and mount as specified in fstab
+-m: mount in different place than fstab; to be implemented
+-c: unmount and close the container; just unmounting not supported
+-h: display this menu
+-v: verbose flag; to be implemented, now it is on
+EOF
+}
+
+# colon after a letter means it requries arguments
+# TODO add : after m when implementing it
+# TODO implement verbose flag
+while getopts ":o:c:mh" option; do
+    case "$option" in
+	o)
+	  # open the encrypted device
+	  echo "opening $OPTARG"
+	  # set -f
+	  # IFS=' '
+	  # cannot put the quotes around OPTARG here
+	  # reference: 3rd source
+	  array=($OPTARG)
+	  # here I want the first parameter to be the device label
+	  # the name under it is to be opened will be the same as
+	  # said label of luks container
+	  # second is FULL path to keyfile
+	  echo ${array[0]} ${array[1]}
+	  open_device ${array[0]} ${array[1]}
+	  # use $HOME instead ~ in the path because quotes prevent it from
+	  # expanded by the shell
+	  ;;
+	c)
+	  # close the encrypted device
+	  echo "closing $OPTARG"
+	  close_device "$OPTARG"
+	  ;;
+	m)
+	  # mount to some different place than fstab/if not in fstab
+	  echo "not implemented yet"
+	  ;;
+	h) # help
+	  display_help
+	  ;;
+	:)
+	  echo "missing argument for option $OPTARG"
+	  ;;
+	?)
+	  display_help
+	  exit 1
+	  ;;
+    esac
+done
+
+# sources
+# https://stackoverflow.com/questions/11279423/bash-getopts-with-multiple-and-mandatory-options
+# https://www.ibm.com/docs/en/aix/7.1?topic=g-getopts-command
+# https://unix.stackexchange.com/questions/164259/provide-two-arguments-to-one-option-using-getopts
