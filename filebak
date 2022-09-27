@@ -107,6 +107,7 @@ make_copy() {
 }
 
 open_device "$device_label" "$device_name" "$backup_destination"
+# the third argument does not seem to be necessary any more
 
 make_copy
 wait
