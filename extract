@@ -70,3 +70,7 @@ ffmpeg -hide_banner -loglevel error -y -i $1.mp4 $1.mp3
 # I do not want to see the garbage ffmpeg prints
 # certainly not all of it
 # might fine tune it later
+
+## source of values
+# https://stackoverflow.com/questions/52115313/mpv-player-time-format-hhmmss-or-hhmmssmmm
+# command: mpv --osd-fractions --osd-level=2
