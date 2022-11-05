@@ -28,7 +28,7 @@ end_m="$(echo $end | cut -d: -f2)"
 
 if [ $end_m -lt $start_m ]; then
 	# I think it is correct
-	hs_to_sec="$((hs_to_sec - start_m + end_m))"
+	hs_to_sec="$(( 10#$hs_to_sec - 10#$start_m + 10#$end_m))"
 else
 	ms_to_sec="$(( (10#$end_m - 10#$start_m) * 60))"
 fi
