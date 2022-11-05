@@ -2,30 +2,46 @@
 
 hour=$(date +'%H') 
 redshift -x > /dev/null 2>&1
+month=$(date +'%m')
 
-if [ "$(date +%B)" = August ]; then
-    if [ "$hour" -gt 19 ] || [ "$hour" -le 7 ]; then
+adjust() {
+    # TODO: use brightnessctl instead of specific tools like xbacklight
+    if [ "$1" = "night" ]; then
 	xbacklight -set 50
 	xrandr --output HDMI-0 --brightness 0.6 > /dev/null 2>&1
 	redshift -O 4500k > /dev/null 2>&1
 	redshift -O 4500k > /dev/null 2>&1
 	exit 0
+    fi
+
+    echo "Too early to set night mode. Setting default values for the day"
+    xbacklight -set 90
+    xrandr --output HDMI-0 --brightness 1 > /dev/null 2>&1
+    redshift -x > /dev/null 2>&1
+    exit 0
+}
+
+# TODO: change to switch?
+
+# for late summer
+if [ "$month" = 8 ]; then
+    if [ "$hour" -gt 19 ] || [ "$hour" -le 7 ]; then
+	adjust "night"
     else
-	echo "Too early to set night mode. Setting default values for the day"
-	xbacklight -set 90
-	xrandr --output HDMI-0 --brightness 1 > /dev/null 2>&1
-	redshift -x > /dev/null 2>&1
-	exit 0
+	adjust "day"
     fi
 fi
 
+# for winter, after time change
+if [ "$month" -gt 10 ]; then
+    if [ "$hour" -gt 14 ]; then
+	adjust "night"
+    fi
+fi
+
+# default case so far before I get my data
 if [ "$hour" -gt 15 ] || [ "$hour" -le 8 ]; then
-	xbacklight -set 50
-	xrandr --output HDMI-0 --brightness 0.6 > /dev/null 2>&1
-	redshift -O 4500k > /dev/null 2>&1
-	redshift -O 4500k > /dev/null 2>&1
+    adjust "night"
 else
-	xbacklight -set 90
-	xrandr --output HDMI-0 --brightness 1 > /dev/null 2>&1
-	redshift -x > /dev/null 2>&1
+    adjust "day"
 fi
