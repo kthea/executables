@@ -58,7 +58,9 @@ while getopts ":o:c:mh" option; do
 	  # the name under it is to be opened will be the same as
 	  # said label of luks container
 	  # second is FULL path to keyfile
-	  echo ${array[0]} ${array[1]}
+	  #echo ${array[0]} ${array[1]}
+	  # the arguments for this option have to be in DOUBLE quotes
+	  # otherwise the latter one is lost
 	  open_device ${array[0]} ${array[1]}
 	  # use $HOME instead ~ in the path because quotes prevent it from
 	  # expanded by the shell
