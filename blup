@@ -3,7 +3,7 @@
 dunstctl close-all
 alt_bl=$(brightnessctl -d amdgpu_bl0 | grep -o --color=never "[0-9]*%" | tr -d %)
 #xbacklight -inc 10 || 
-brightnessctl -d amdgpu_bl0 set "$(($alt_bl + 10))%"
+xbacklight -inc 10 || brightnessctl -d amdgpu_bl0 set "$(($alt_bl + 10))%"
 notify-send -c brightness -t 1500 "Brightness increased"\
  "Current brightness $(xbacklight -get | cut -d'.' -f1)"
 # I have to leave whitespace in the beginning or else the
