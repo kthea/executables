@@ -2,16 +2,17 @@
 
 #ls "$HOME"/Pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete" | xargs -I {} feh --bg-fill --no-fehbg "{}"
 #sel=$(find "$HOME"/Pictures/wallpapers/* | dmenu -b -l 10 -fn  "Hack Regular Nerd Font Complete")
-WALL_DIR="$HOME"/Pictures/wallpapers
-sel=$WALL_DIR/$(ls "$WALL_DIR" | dmenu -i -l 10 -fn  "Hack Regular Nerd Font Complete")
+WALL_DIR=Pictures/wallpapers
+WALL_DIR2='$HOME'/$WALL_DIR
+sel=$WALL_DIR2/$(ls "$HOME/$WALL_DIR" | dmenu -i -l 10 -fn  "Hack Regular Nerd Font Complete")
 # otherwise sel is set to first item and it is ugly
 # and I need to add this dreary / at the end because otherwise it
 # does not match
 # TODO: make trailing slash independent
-if [ "$sel" = "$WALL_DIR"/ ];
+if [ "$sel" = "$WALL_DIR2"/ ];
 then
 	exit 1
 fi
-feh --bg-fill --no-fehbg "$sel"
+feh --bg-fill --no-fehbg "$WALL_DIR"/$(basename $sel)
 prev=$(grep "WALLPAPER" "$XDG_CONFIG_HOME"/shell/variables | cut -d= -f2)
 sed -i "s,$prev,$sel,g" "$XDG_CONFIG_HOME"/shell/variables 
