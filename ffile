@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# this script is an improvement of gext script
+start=${1:-$HOME}
+font_name="Hack Regular Nerd Font Complete"
+lines=10
+verbose=false
+
+while true
+do
+    # readarray -d '' arr < <(find $start -maxdepth 1 -not -path "*/.*" -print0)
+    # arr=$(find $start -maxdepth 1 -not -path "*/.*")
+    # arr=(arr)
+    # arr+=("..") does not work a parent dir
+    [ "$verbose" = true ] && { 
+	echo "Start of loop: start = $start and start_prev = $start_prev"; }
+
+    start_prev="$start"
+    # the xargs -0 was important as otherwise it broke on spaces
+    start=$(find $start -maxdepth 1 -not -path "*/.*" -print0 |
+		sort -z | xargs -0 printf "%s\n" |
+		dmenu -i -l "$lines" -fn "$font_name")
+    # [ -f "$start" ] && { open "$start"; exit 0; } alternative action
+    [ -f "$start" ] && {
+	open "$start";
+	start="$start_prev";
+	[ "$verbose" = true ] && { 
+	    echo "In opening: start = $start and start_prev = $start_prev"; }
+	# I experienced a problem here earlier that the last if changed
+	# the working directory even though I did not want it to happen
+	# the issue was that after closing opened file the current working
+	# directory was the parent directory of where the file was opened
+	# I did not want that to happen of course
+	# the cause was much more trivial than I had expected as I misspelled
+	# the name of variable I wrote prev_start instead of start_prev
+	start_prev=$(dirname "$start");
+    }
+    # prevents infinite loop that could not be stopped by C-c nor C-g
+    [ -z "$start" ] && exit 0
+    # if the current directory (first entry on the sorted list)
+    # was chosen then go up
+    # TODO: make it display correct name of directory
+    [ "$verbose" = true ] && { 
+	echo "Before last if: start = $start and start_prev = $start_prev"; }
+
+    [ "$start_prev" = "$start" ] && start=$(dirname "$start")
+
+    [ "$verbose" = true ] && { 
+	echo "After last if: start = $start and start_prev = $start_prev";
+	echo -ne "\n"; }
+done
+
+# not every source is actively used
+# but at some point every contributed to development
+# of this script so I am keeping them for future
+# reference
+# sources
+# https://stackoverflow.com/questions/23356779/how-can-i-store-the-find-command-results-as-an-array-in-bash/54561526#54561526
+# https://unix.stackexchange.com/questions/34325/sorting-the-output-of-find-print0-by-piping-to-the-sort-command
+# https://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
+# https://stackoverflow.com/questions/23356779/how-can-i-store-the-find-command-results-as-an-array-in-bash/54561526#54561526

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+fl=$(basename "$1")
+ext="${fl#*.}"
+
+case "$ext" in
+    pdf|djvu|ps)
+	zathura "$1"
+	;;
+    txt|md|org|sh|py|rs|html|css|js|tex)
+	emacsclient -c -a "term nvim" "$1"
+	;;
+    webm|mp3|mp4)
+	mpv "$1"
+	;;
+    xopp)
+	xournalpp "$1"
+esac
