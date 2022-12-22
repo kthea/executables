@@ -1,2 +1,2 @@
 #!/bin/sh
-"$TERMINAL" || xterm
+{ "$TERMINAL" -e "$@" || xterm -e "$@"; } || { "$TERMINAL" || xterm; }
