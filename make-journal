@@ -1,0 +1,5 @@
+#!/bin/sh
+
+journal_dir="$HOME"/Journals
+touch "$journal_dir"/"$(date -I)".txt
+emacsclient -c "$journal_dir"/"$(date -I)".txt
