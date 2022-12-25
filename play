@@ -1,14 +1,21 @@
 #!/bin/sh
 
+video_dir=$(xdg-user-dir VIDEOS)
+
 for response in "$@";
 do
-	find $HOME/Videos -name "$response".mp3 | xargs /usr/bin/mpv --really-quiet
+	find "$video_dir" -name "$response".mp3 | xargs /usr/bin/mpv --really-quiet
 done
+# sources
+
 # find ~/Documents/videos -type f -exec grep -Iq . {} \; -print | xargs basename -a
 # list all the files that can be played
-# source https://stackoverflow.com/questions/4767396/linux-command-how-to-find-only-text-files
+# https://stackoverflow.com/questions/4767396/linux-command-how-to-find-only-text-files
 
 # later edit
 # find ~/Documents/videos -type f -exec grep -Iq . {} \; -print | xargs -I '{}' bash -c 'play $(basename -a {}) '
 # way to instantly play all available in the order they are found
 # https://stackoverflow.com/questions/29278466/can-xargs-execute-a-subshell-command-for-each-argument
+
+# even later edit
+# https://wiki.archlinux.org/title/XDG_user_directories
