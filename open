@@ -16,3 +16,6 @@ case "$ext" in
     xopp)
 	xournalpp "$1"
 esac
+
+# sources
+# https://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
