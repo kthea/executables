@@ -10,7 +10,7 @@ case "$ext" in
     txt|md|org|sh|py|rs|html|css|js|tex)
 	emacsclient -c -a "term nvim" "$1"
 	;;
-    webm|mp3|mp4)
+    webm|mp3|mp4|mkv)
 	mpv "$1"
 	;;
     xopp)
