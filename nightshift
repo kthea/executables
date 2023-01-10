@@ -23,25 +23,27 @@ adjust() {
 
 # TODO: change to switch?
 
-# for late summer
-if [ "$month" = 8 ]; then
-    if [ "$hour" -gt 19 ] || [ "$hour" -le 7 ]; then
-	adjust "night"
-    else
-	adjust "day"
-    fi
-fi
-
-# for winter, after time change
-if [ "$month" -gt 10 ]; then
-    if [ "$hour" -gt 14 ]; then
-	adjust "night"
-    fi
-fi
-
-# default case so far before I get my data
-if [ "$hour" -gt 15 ] || [ "$hour" -le 8 ]; then
-    adjust "night"
-else
-    adjust "day"
-fi
+case "$month" in
+    8)
+	# for late summer
+	if [ "$hour" -gt 19 ] || [ "$hour" -le 7 ]; then
+	    adjust "night"
+	else
+	    adjust "day"
+	fi
+	exit;;
+    [0-1][1-2])
+	# for winter, after time change
+	if [ "$hour" -gt 14 ]; then
+	    adjust "night"
+	fi
+	exit;;
+    *)
+	# default case so far before I get my data
+	if [ "$hour" -gt 15 ] || [ "$hour" -le 8 ]; then
+	    adjust "night"
+	else
+	    adjust "day"
+	fi
+	exit;;
+esac
