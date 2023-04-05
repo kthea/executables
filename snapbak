@@ -1,34 +1,122 @@
 #!/bin/sh
 
-backup_prefix=/media/$USER
-device_name=${1:-wd_black}
-backup_destination=$backup_prefix/$device_name/snapshots/$(date -I)
-mkdir -p $backup_prefix/$device_name/snapshots/$(date -I)
+# the shift is necessary as the first argument is the -s option
+# I do not know how to easily completely exclude everything starting
+# with hyphen
+# shift 1
+# however this broke the rest of script so now I will just access the rest
+# by manually increasing id
 
-cnf ls-files > /tmp/file_list_config
-rsync -rtvzP --files-from=/tmp/file_list_config\
-    "$XDG_CONFIG_HOME"/ $backup_destination/conf_bak\
-    --delete
+backup_prefix=/media/"$USER"
+key_dir="$HOME"/Documents/pass
 
-bnf ls-files > /tmp/file_list_bin
-rsync -rtvzP --include-from=/tmp/file_list_bin --exclude="*"\
-    "$HOME"/.local/bin/ "$backup_destination"/bin_bak\
-    --delete-excluded
+device_name="$1"
+key_name="${2:-$1}"
 
-mnf ls-files > /tmp/file_list_man
-rsync -rtvzP --files-from=/tmp/file_list_man\
-    "$HOME"/.local/share/man/\
-    "$backup_destination"/man_bak --delete-excluded
+if [ $# -gt 2 ]; then
+    device_name="$2"
+    key_name="${3:-$2}"
+fi
 
-rsync -rtvzP --exclude vms --exclude backup --exclude\
-    configuration\ --exclude executables --exclude\
-    "dl/software/images" "$HOME"/Documents $backup_destination/\
-    --delete --delete-excluded
-rsync -rtvzP "$HOME"/Notes $backup_destination/\
-    --delete --delete-excluded
-rsync -rtvzP "$HOME"/Pictures $backup_destination/\
-    --delete --delete-excluded
-rsync -rtvzP --exclude="*~" "$HOME"/Journals\
-    "$backup_destination"/ --delete --delete-excluded
-rsync -rtvzP --exclude="**/.git" "$HOME"/Projects\
-    $backup_destination/ --delete --delete-excluded
+backup_destination="$backup_prefix"/"$device_name"/snapshots/"$(date -I)"
+
+# xdg user dirs
+music_dir="$(xdg-user-dir MUSIC)"
+pictures_dir="$(xdg-user-dir PICTURES)"
+videos_dir="$(xdg-user-dir VIDEOS)"
+documents_dir="$(xdg-user-dir DOCUMENTS)"
+
+# TODO: reconsider opening here more
+# maybe move the calls to cryptctl and snapbak
+# to another script
+cryptctl -o "$device_name ${key_dir}/$key_name"
+
+mkdir -p "$backup_destination"
+
+copy_hidden() {
+    # config backup
+    cnf ls-files > /tmp/file_list_config
+    rsync -rtvzP --files-from=/tmp/file_list_config\
+	"$XDG_CONFIG_HOME"/ "$backup_destination"/conf_bak\
+	--delete
+
+    # script backup
+    bnf ls-files > /tmp/file_list_bin
+    rsync -rtvzP --include-from=/tmp/file_list_bin --exclude="*"\
+	"$HOME"/.local/bin/ "$backup_destination"/bin_bak\
+	--delete-excluded
+
+    # manual pages backup
+    mnf ls-files > /tmp/file_list_man
+    rsync -rtvzP --files-from=/tmp/file_list_man\
+	"$HOME"/.local/share/man/\
+	"$backup_destination"/man_bak --delete-excluded
+}
+
+copy_xdg_user_dirs() {
+    # Documents backup
+    # TODO: provide automated criteria to exlude
+    rsync -rtvzP --exclude vms --exclude backup --exclude\
+	configuration\ --exclude executables --exclude\
+	"dl/software/images" "$HOME"/Documents "$backup_destination"/\
+	--delete --delete-excluded
+
+    # Notes backup - everything to be copied as files are small
+    # for the same reason do not delete anything
+    rsync -rtvzP "$HOME"/Notes "$backup_destination"/
+
+    # Pictures backup - too important to be replaced with a monthly
+    # snapshot
+    rsync -rtvzP "$pictures_dir" "$backup_destination"/\
+	--delete --delete-excluded
+
+    # Music backup - not that important but nice to have, and does not
+    # take up that much space so it does not have to be compressed, not
+    # yet at least
+
+    rsync -rtvzP "$music_dir" "$backup_destination"/\
+	--delete --delete-excluded
+
+    # Journals backup - do not exclude anything as it might become
+    # useful later though it probably will not
+    rsync -rtvzP "$HOME"/Journals "$backup_destination"/
+
+    # Projects backup - least important things to backup because
+    # these files are supposed to be in some kind of online repository
+    # but nice to have. Also keep just files without reference to vcs
+    rsync -rtvzP --exclude="**/.git" "$HOME"/Projects\
+	"$backup_destination"/ --delete --delete-excluded
+}
+
+create_snapshot() {
+    # Media backup - this directory consists of at least 3 subdirectories:
+    # pictures, videos, music. Only two of them are meant to be backed up by rsync
+    # and the videos directory has to be compressed first
+    #rsync -rtvzP "$HOME"/Media --exclude videos/Captures --exclude videos/Desktop\
+	#    "$backup_destination"/ --delete --delete-excluded
+    cd "$(dirname $videos_dir)"
+    tar cvf - "$(basename $videos_dir)" | lz4 -9 - "$backup_destination"/\
+					      videos.tar.lz4
+    cd -
+    cd "$documents_dir"/dl/software/
+    tar cvf - images | lz4 -9 - "$backup_destination"/images.tar.lz4
+    cd -
+}
+
+copy_hidden
+copy_xdg_user_dirs
+
+while getopts "s" option; do
+    case "$option" in
+	s)
+	    create_snapshot
+	    exit 0
+	    ;;
+	?)
+	    exit 1
+	    ;;
+    esac
+done
+
+# sources:
+# against using shift 1: https://unix.stackexchange.com/questions/455155/unshift-args-after-calling-shift-1
