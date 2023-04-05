@@ -13,8 +13,12 @@ case "$ext" in
     webm|mp3|mp4|mkv)
 	mpv "$1"
 	;;
+    png|jpg|webm|jpeg|gif)
+	sxiv "$1"
+	;;
     xopp)
 	xournalpp "$1"
+	;;
 esac
 
 # sources
