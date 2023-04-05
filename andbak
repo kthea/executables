@@ -21,6 +21,9 @@ then
 	rsync -rtvzP root@"${miphone_addr}":/sdcard/DCIM/Camera "$miphone_dir"
 	rsync -rtvzP root@"${miphone_addr}":/sdcard/Pictures "$miphone_dir"
 	rsync -rtvzP root@"${miphone_addr}":/sdcard/DCIM/Screenshots "$miphone_dir"
+	# also copy music because I download a lot of on my phone
+	# through newpipe
+	rsync -rtvzP root@"${miphone_addr}":/sdcard/Download/*.m4a "$miphone_dir"/music
 fi
 
 ping -W 0.5 -c1 "$mipad_addr" 2>&1 > /dev/null
