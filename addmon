@@ -1,0 +1,6 @@
+#/bin/sh
+
+# TODO: avoid code repetition in xinitrc but it is not important
+xrandr --output HDMI-0 --auto --left-of DP-2 --output DP-2 --auto
+herbstclient reload
+feh --bg-fill --no-fehbg "$WALLPAPER"
