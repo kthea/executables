@@ -56,9 +56,8 @@ copy_hidden() {
 copy_xdg_user_dirs() {
     # Documents backup
     # TODO: provide automated criteria to exlude
-    rsync -rtvzP --exclude vms --exclude backup --exclude\
-	configuration\ --exclude executables --exclude\
-	"dl/software/images" "$HOME"/Documents "$backup_destination"/\
+    rsync -rtvzP --exclude vms --exclude backup \
+	"$HOME"/Documents "$backup_destination"/ \
 	--delete --delete-excluded
 
     # Notes backup - everything to be copied as files are small
@@ -67,7 +66,7 @@ copy_xdg_user_dirs() {
 
     # Pictures backup - too important to be replaced with a monthly
     # snapshot
-    rsync -rtvzP "$pictures_dir" "$backup_destination"/\
+    rsync -rtvzP "$pictures_dir" "$backup_destination"/ \
 	--delete --delete-excluded
 
     # Music backup - not that important but nice to have, and does not
@@ -84,8 +83,9 @@ copy_xdg_user_dirs() {
     # Projects backup - least important things to backup because
     # these files are supposed to be in some kind of online repository
     # but nice to have. Also keep just files without reference to vcs
-    rsync -rtvzP --exclude="**/.git" "$HOME"/Projects\
-	"$backup_destination"/ --delete --delete-excluded
+    rsync -rtvzP --exclude="**/.git" --exclude="**/*env*/" \
+	    --exclude="dockerimg" --exclude="**/lib*" --exclude="**/bin*" \
+	    "$HOME"/Projects "$backup_destination"/ --delete --delete-excluded
 }
 
 create_snapshot() {

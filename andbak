@@ -1,6 +1,6 @@
 #!/bin/sh
-#miphone_addr="192.168.1.8"
-miphone_addr="192.168.1.25"
+miphone_addr="192.168.1.8"
+#miphone_addr="192.168.1.25"
 mipad_addr="192.168.1.12"
 miphone_dir="$HOME/Documents/backup/miphone"
 mipad_dir="$HOME/Documents/backup/mipad"
@@ -13,7 +13,8 @@ mipad_dir="$HOME/Documents/backup/mipad"
 # rsync -rtvzP root@192.168.1.8:/sdcard/DCIM/Camera .
 
 # this ping actually does not do what I wanted it to do
-ping -W 0.5 -c1 "$miphone_addr" 2>&1 > /dev/null
+#ping -W 0.5 -c1 "$miphone_addr" 2>&1 > /dev/null
+echo phone
 
 if [ $? = 0 ];
 then
