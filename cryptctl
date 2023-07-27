@@ -69,6 +69,7 @@ while getopts ":o:c:mh" option; do
 	  # close the encrypted device
 	  echo "closing $OPTARG"
 	  close_device "$OPTARG"
+	  scr status "$OPTARG" || echo "Device $OPTARG closed successfully"
 	  ;;
 	m)
 	  # mount to some different place than fstab/if not in fstab
