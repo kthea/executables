@@ -83,7 +83,7 @@ copy_xdg_user_dirs() {
     # Projects backup - least important things to backup because
     # these files are supposed to be in some kind of online repository
     # but nice to have. Also keep just files without reference to vcs
-    rsync -rtvzP --exclude="**/.git" --exclude="**/*env*/" \
+    rsync -rtvzP --exclude="**/.git" --exclude="**/*env*/" --exclude="img" \
 	    --exclude="dockerimg" --exclude="**/lib*" --exclude="**/bin*" \
 	    "$HOME"/Projects "$backup_destination"/ --delete --delete-excluded
 }
