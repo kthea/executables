@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# TODO: add this findings to my notes
+xrandr --output HDMI-0 --off
+
+# the above will not change HDMI-0's state to disconnected in output of xrandr
+# however that does not seem
+
+# wrong bar appears on my laptop monitor
+barcher
+
+# communicate what happens to window manager, otherwise geometry gets broken
+# and also windows are not in correct places
+herbstclient reload
+
+# sources:
+# - https://askubuntu.com/questions/366813/disable-second-non-existent-screen-from-command-line
+# - https://superuser.com/questions/618127/disable-unplugged-displays-xrandr
