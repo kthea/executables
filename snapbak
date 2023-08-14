@@ -66,8 +66,9 @@ copy_xdg_user_dirs() {
 
     # Pictures backup - too important to be replaced with a monthly
     # snapshot
-    rsync -rtvzP "$pictures_dir" "$backup_destination"/ \
-	--delete --delete-excluded
+    # TODO: not anymore, replace pictures with incremental backups
+    # rsync -rtvzP "$pictures_dir" "$backup_destination"/ \
+    # 	--delete --delete-excluded
 
     # Music backup - not that important but nice to have, and does not
     # take up that much space so it does not have to be compressed, not
@@ -88,27 +89,37 @@ copy_xdg_user_dirs() {
 	    "$HOME"/Projects "$backup_destination"/ --delete --delete-excluded
 }
 
-create_snapshot() {
-    # Media backup - this directory consists of at least 3 subdirectories:
-    # pictures, videos, music. Only two of them are meant to be backed up by rsync
-    # and the videos directory has to be compressed first
-    #rsync -rtvzP "$HOME"/Media --exclude videos/Captures --exclude videos/Desktop\
-	#    "$backup_destination"/ --delete --delete-excluded
-    cd "$(dirname $videos_dir)"
-    tar cvf - "$(basename $videos_dir)" | lz4 -9 - "$backup_destination"/\
-					      videos.tar.lz4
-    cd -
-    cd "$documents_dir"/dl/software/
-    tar cvf - images | lz4 -9 - "$backup_destination"/images.tar.lz4
-    cd -
-}
+# create_snapshot() {
+#    Media backup - this directory consists of at least 3 subdirectories:
+#    pictures, videos, music. Only two of them are meant to be backed up by rsync
+#    and the videos directory has to be compressed first
+#    rsync -rtvzP "$HOME"/Media --exclude videos/Captures --exclude videos/Desktop\
+#	   "$backup_destination"/ --delete --delete-excluded
+#     cd "$(dirname $videos_dir)"
+#     tar cvf - "$(basename $videos_dir)" | lz4 -9 - "$backup_destination"/\
+# 					      videos.tar.lz4
+#     cd -
+#     cd "$documents_dir"/dl/software/
+#     tar cvf - images | lz4 -9 - "$backup_destination"/images.tar.lz4
+#     cd -
+# the above commands are not needed any more
+# this is a draft how making a snapshot should look for now
+# rsync -avhp --progress ~/University/ \
+#	/media/thea/wd_black/individual/University-????-??-??
+# mv /media/thea/wd_black/individual/University-????-??-?? \
+#	/media/thea/wd_black/individual/University-$(date -I)
+# rsync -avhp --progress ~/Media/videos/ /media/thea/wd_black/individual/Videos
+# mv /media/thea/wd_black/individual/Videos-????-??-?? \
+#	/media/thea/wd_black/individual/Videos-$(date -I)
+# }
 
 copy_hidden
 copy_xdg_user_dirs
 
-while getopts "s" option; do
+while getopts "i" option; do
     case "$option" in
-	s)
+	i)
+		# i for individual
 	    create_snapshot
 	    exit 0
 	    ;;
