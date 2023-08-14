@@ -1,1 +1,1 @@
-/usr/bin/git --git-dir=$HOME/Projects/configuration --work-tree=$HOME/.config "$@"
+/usr/bin/git --git-dir=$HOME/Projects/bare/configuration --work-tree=$HOME/.config "$@"

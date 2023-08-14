@@ -1,0 +1,1 @@
+/usr/bin/git --git-dir=$HOME/Projects/bare/manpages --work-tree=$HOME/.local/share/man "$@"

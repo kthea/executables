@@ -1,1 +1,1 @@
-/usr/bin/git --git-dir=$HOME/Projects/executables --work-tree=$HOME/.local/bin "$@"
+/usr/bin/git --git-dir=$HOME/Projects/bare/executables --work-tree=$HOME/.local/bin "$@"
