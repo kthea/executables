@@ -1,0 +1,15 @@
+#!/bin/sh
+
+filename="$1"
+export new_dir=/tmp/reactions/"$(uuidgen)"
+videos_dir="$(xdg-user-dir VIDEOS)"
+
+mkdir -p "$new_dir"
+
+# assumes mp3 for now because they are widely used and whatever
+find "$videos_dir" -iname "$filename".mp3 | xargs -I '{}' sh -c 'cp {} $new_dir'
+
+pcmanfm "$new_dir" &> /dev/null
+
+# https://stackoverflow.com/questions/15430877/bash-xargs-passing-variable
+# https://ubuntuforums.org/showthread.php?t=1898111
