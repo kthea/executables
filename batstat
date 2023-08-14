@@ -5,6 +5,6 @@ log_dir=${XDG_DATA_HOME-:$HOME/.local/share}/batstat
 test -d "$log_dir" || mkdir -p "$log_dir"
 while true
 do
-	acpi >> "$log_dir"/log
-	sleep 1
+	echo "$(date +'%F %H:%M:%S') - $(acpi)" | tee -a "$log_dir"/log
+	sleep 30
 done
