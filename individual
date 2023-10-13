@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# based on dreary rsync commands that I had to run by by hand to
+# something more automated
+
+# since my history file is gone again and I lost the exact command
+# that achieved what I want to do now I need to improvise
+
+update() {
+    source="$1"
+    target="$2"
+
+    rsync -avzhp "$source" "$target"
+    corename="$(basename $target | cut -d- -f1)"
+    dname="$(dirname $target)"
+    mv "$target" "$dname"/"$corename-$(date -I)"
+}
+
+mount_point=/media/$USER/wd_black
+dest_dir=individual
+full_path="$mount_point"/"$dest_dir"
+videos_dir="$(xdg-user-dir VIDEOS)"
+
+# note to self: never initialise directory to have a trailing slash,
+# better just add manually to the end if necessary
+
+copy_manually() {
+    # this was just for storing the exact commands which were later
+    # abstracted to more general "update" method
+    # I am leaving here only for future reference but this should not be used
+    # and will be deleted at some point
+
+    # something like that I do not remember exact options
+    rsync -avzhp $HOME/University/ "$full_path"/University-????-??-??/
+    mv "$full_path"/University-????-??-??/ "$full_path"/University-"$(date -I)"/
+
+    # trailing slash is important as I just want to update the existing
+    # directory not copy something to it
+    rsync -avzhp "$videos_dir" "$full_path"/Videos-????-??-??/
+    mv "$videos_dir" "$full_path"/Videos-"$(date -I)"/
+
+}
+
+# than by using the update function the copy_manually would hopefully simplify to
+
+update $HOME/University/ "$full_path"/University-????-??-??/
+update "$videos_dir/" "$full_path"/Videos-????-??-??/
+
+# better yet create array of pairs and loop over it but arrays are
+# bash specific, definitely not portable, so I will not do that for
+# now and consider the alternatives first
