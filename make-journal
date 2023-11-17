@@ -1,5 +1,6 @@
 #!/bin/sh
 
 journal_dir="$HOME"/Journals
-touch "$journal_dir"/"$(date -I)".txt
-emacsclient -c "$journal_dir"/"$(date -I)".txt
+entry_name=${1:-"$(date -I)"}
+touch "$journal_dir"/"$entry_name".txt
+emacsclient -c "$journal_dir"/"$entry_name".txt
