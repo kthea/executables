@@ -70,13 +70,6 @@ copy_xdg_user_dirs() {
     # rsync -rtvzP "$pictures_dir" "$backup_destination"/ \
     # 	--delete --delete-excluded
 
-    # Music backup - not that important but nice to have, and does not
-    # take up that much space so it does not have to be compressed, not
-    # yet at least
-
-    rsync -rtvzP "$music_dir" "$backup_destination"/\
-	--delete --delete-excluded
-
     # Journals backup - do not exclude anything as it might become
     # useful later though it probably will not
     rsync -rtvzP "$HOME"/Journals "$backup_destination"/
@@ -85,8 +78,9 @@ copy_xdg_user_dirs() {
     # these files are supposed to be in some kind of online repository
     # but nice to have. Also keep just files without reference to vcs
     rsync -rtvzP --exclude="**/.git" --exclude="**/*env*/" --exclude="img" \
-	    --exclude="dockerimg" --exclude="**/lib*" --exclude="**/bin*" \
-	    "$HOME"/Projects "$backup_destination"/ --delete --delete-excluded
+	  --exclude="dockerimg" --exclude="**/lib*" --exclude="**/bin*" \
+	  --exclude="vm" --exclude="**/*.img" \
+	  "$HOME"/Projects "$backup_destination"/ --delete --delete-excluded
 }
 
 # create_snapshot() {
