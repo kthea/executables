@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 safe_mv() {
-    [ "$1" = "$2" ] || safe_mv "$1" "$2"
+    [ "$1" = "$2" ] || mv "$1" "$2"
 }
 
 update() {
@@ -11,8 +11,6 @@ update() {
     rsync -avzhp "$source" "$target"
     corename="$(basename $target | cut -d- -f1)"
     dname="$(dirname $target)"
-    echo $target $dname $corename
-    echo "$dname"/"$corename-$(date -I)"
     safe_mv "$target" "$dname"/"$corename-$(date -I)"
 }
 
