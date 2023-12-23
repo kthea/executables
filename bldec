@@ -1,9 +1,9 @@
 #!/bin/bash
 
 dunstctl close-all
-alt_bl=$(brightnessctl -d amdgpu_bl0 | grep -o --color=never "[0-9]*%" | tr -d %)
-xbacklight -dec 10 || brightnessctl -d amdgpu_bl0 set "$(($alt_bl - 10))%"
+alt_bl=$(brightnessctl -d intel_backlight | grep -o --color=never "[0-9]*%" | tr -d %)
+brightnessctl -d intel_backlight set "$(($alt_bl - 10))%"
 notify-send -c brightness -t 1500 "Brightness decreased"\
- "Current brightness $(xbacklight -get | cut -d'.' -f1)"
+ "Current brightness $(($alt_bl - 10))"
 # I have to leave whitespace in the beginning or else the
 # formatting is not correct
