@@ -7,6 +7,7 @@ month=$(date +'%m')
 adjust() {
     # TODO: use brightnessctl instead of specific tools like xbacklight
     if [ "$1" = "night" ]; then
+	# https://unix.stackexchange.com/questions/89712/how-to-convert-floating-point-number-to-integer
 	max_brightness=20
 	current_brightness=$(printf "%.0f" $(xbacklight -get))
 	[ $current_brightness -gt $max_brightness ] && xbacklight -set $max_brightness
