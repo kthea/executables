@@ -24,18 +24,19 @@ if [ $? = 0 ];
 then
 # maybe make this into a function
     rsync -rtvzP root@"${miphone_addr}":/sdcard/DCIM/Camera \
-	  --exclude="*.mp4" --exclude="Raw" "$pictures_dir"
+	  --exclude="*.mp4" --exclude="Raw" --exclude=".trashed*" "$pictures_dir"
     rsync -rtvzP root@"${miphone_addr}":/sdcard/Pictures \
 	  --exclude=".*" "$pictures_dir"
-	rsync -rtvzP root@"${miphone_addr}":/sdcard/DCIM/Screenshots "$pictures_dir"
+	rsync -rtvzP --exclude=".trashed*" root@"${miphone_addr}":/sdcard/DCIM/Screenshots "$pictures_dir"
 	# also copy music because I download a lot of on my phone
 	# through newpipe
 	rsync -rtvzP root@"${miphone_addr}":/sdcard/Download/*.m4a "$music_dir"
 	# if it copies Videos as well from DCIM or whatever, then copy videos
 	# I received as a message as well, because they are apparently stored
 	# in a different directory
-	rsync -rtvzP root@"${miphone_addr}":/sdcard/Movies \
-	      --exclude=".*" "$videos_dir"
+	# I do not want to back movies up at this point
+	# rsync -rtvzP root@"${miphone_addr}":/sdcard/Movies \
+	#      --exclude=".*" "$videos_dir"
 	rsync -rtvzP root@"${miphone_addr}":/sdcard/DCIM/Camera/*.mp4 \
 	      "$videos_dir"/Camera
 fi
