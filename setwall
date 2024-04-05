@@ -9,7 +9,7 @@ wall_dir_alt=$(echo $wall_dir | sed s,$HOME,'$HOME',)
 sel=$(find "$wall_dir" -type f -print0 |
 	  # slow with sh -c but without basename did not work
 	  xargs -0 -I {} sh -c 'echo $(basename -a "{}")' |
-	  dmenu -i -l "$lines" -fn "$font_name")
+	  rofi -dmenu -i -l "$lines" -fn "$font_name")
 # TODO:
 # something to consider? sel=$(ffile "$wall_dir")
 
