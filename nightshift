@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 hour=$(date +'%H') 
 redshift -x > /dev/null 2>&1
@@ -7,7 +7,9 @@ month=$(date +'%m')
 adjust() {
     # TODO: use brightnessctl instead of specific tools like xbacklight
     if [ "$1" = "night" ]; then
-	xbacklight -set 50
+    	max_brightness=50
+        current_brightness=$(printf "%.0f" $(xbacklight -get))
+        [ $current_brightness -gt $max_brightness ] || xbacklight -set $max_brightness
 	xrandr --output HDMI-0 --brightness 0.6 > /dev/null 2>&1
 	redshift -O 4500k > /dev/null 2>&1
 	redshift -O 4500k > /dev/null 2>&1
