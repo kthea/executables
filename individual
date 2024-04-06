@@ -11,7 +11,7 @@ update() {
     rsync -avzhp "$source" "$target"
     corename="$(basename $target | cut -d- -f1)"
     dname="$(dirname $target)"
-    safe_mv "$target" "$dname"/"$corename-$(date -I)"
+    safe_mv $(realpath "$target") "$dname"/"$corename-$(date -I)"
 }
 
 # note to self: never initialise directory to have a trailing slash,
