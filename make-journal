@@ -1,6 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-journal_dir="$HOME"/Journals
+
+journal_dir=$"{JOURNAL_DIR:-$HOME/Journals}"
+if [ -d $journal_dir ]; then
+	echo 'Journal directory does not exist!'
+	exit 1
+fi
 entry_name=${1:-"$(date -I)"}
 touch "$journal_dir"/"$entry_name".txt
 emacsclient -c "$journal_dir"/"$entry_name".txt
