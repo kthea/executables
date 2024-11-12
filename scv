@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 dest_dir="$(xdg-user-dir PICTURES)"/saved
 # TODO: add fallback directories
 dest_name="shot-%Y%m%d%H%M%S.png"
